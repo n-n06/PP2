@@ -1,10 +1,10 @@
 import os
-from colorama import Fore, Back, Style, init
+from colorama import Fore, init
 
 init(autoreset=True)
-path = input()
+path = input("Input a path: ")
 for dirpath, dirnames, filenames in os.walk(path, '.'):
-    print(dirpath)
+    print(Fore.BLUE + str(dirpath))
     for f in filenames:
-        print(Fore.BLUE + f"{os.path.join(dirpath, f)}")
+        print(os.path.join(dirpath, f))
     print("\n")
