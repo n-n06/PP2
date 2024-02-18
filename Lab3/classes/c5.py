@@ -13,6 +13,8 @@ class Account:
     def withdrawal(self, value):
         if self.balance - value < 0:
             print("You are not allowed to overdraw your account!")
+        elif value < 0:
+            print("You cannot withdraw a negative value")
         else:
             self.balance -= value
 

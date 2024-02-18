@@ -1,3 +1,3 @@
 def rev(s):
-    return " ".join(s.split()[::-1])
+    return s[::-1]
 

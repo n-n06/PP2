@@ -10,15 +10,19 @@ from f13 import guess_game
 
 print("100 grams in ounces: ",f1.to_ounces(100))
 print(f2.to_celciuim(270))
-print(f3.solve(30,24))
+print(f3.solve(24,30))
 
-print(f4.filter_prime([11,9,19,5,7,8,10]))
-print(f5.all_perm("Eve"))
+print(f4.filter_prime([11,9,19,5,7,8,10]), "\n")
+
+s = input("Input a string for permutations: ")
+f5.all_perm(s)
+print("\n")
+
 print(rev("history"))
 print(has_33([3,4,3,5,6,8]))
 print(spy_game([4,0,9,4,0,7]))
 print(volume(5))
 print(unique([1,1,2,3]))
-print(is_palindrome("tenet"))
+print(is_palindrome("tenet"), "\n")
 histogram([3,6,8,2,4,7])
 guess_game()
