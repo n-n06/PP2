@@ -10,7 +10,7 @@ Interface Status
 DN                                                 Description           Speed    MTU 
 -------------------------------------------------- --------------------  ------  ------
 ''', end = "")
-
+           
 imdata = data["imdata"]
 for i in imdata:
     dn = i["l1PhysIf"]["attributes"]["dn"]
