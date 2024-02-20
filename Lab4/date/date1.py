@@ -1,8 +1,11 @@
-from datetime import timedelta, datetime as dt
-x = dt.now()
-print(x.strftime(format = "%Y-%m-%d"))
-five_days_ago = x - timedelta(days=5)
-print(five_days_ago.strftime(format = "%Y-%m-%d"))
+from datetime import timedelta
+from datetime import date
 
-print(f"\n{x.strftime(format="%B %d, %Y. %A")}")
+today = date.today()
+print(today)
+five_days_ago = today - timedelta(days=5)
+print(five_days_ago)
+
+
+print(f"\n{today.strftime(format="%B %d, %Y. %A")}")
 print(five_days_ago.strftime(format = "%B %d, %Y. %A"))
