@@ -1,4 +1,6 @@
 from random import getrandbits, randint
-bool_tuple = tuple(bool(getrandbits(1)) for i in range(randint(1,10)))
-print(bool_tuple)
+bool_tuple = (True, False, False)
+bool_tuple2 = (True, True, True, True)
+
 print(all(bool_tuple))
+print(all(bool_tuple2))

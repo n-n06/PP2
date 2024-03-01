@@ -1,3 +1,4 @@
+#deletes text8.txt
 import os
 
 path = input()
