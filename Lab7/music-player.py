@@ -52,6 +52,9 @@ forward_rect = forward.get_rect(center = (screen.get_rect().center[0]*3/2, 350))
 back_rect = back.get_rect(center = (screen.get_rect().center[0]/2, 350))
 folder_rect = folder.get_rect(center = (40,40))
 clear_rect = clear.get_rect(center = (40,100))
+info_rect1 = pygame.Rect(200,50,400,40)
+info_rect2 = pygame.Rect(200,150,400,40)
+
 
 '''
 File handling
@@ -178,7 +181,19 @@ while loop:
     back_button = screen.blit(back, back_rect)
     folder_button = screen.blit(folder, folder_rect)
     clear_button = screen.blit(clear, clear_rect)
-    #
+
+    font = pygame.font.Font(None, 36)
+    text1 = font.render("Now Playing:", True, (255,255,255))
+    text_rect1 = text1.get_rect(center=info_rect1.center)
+    pygame.draw.rect(screen, (40,40,50), info_rect1)
+
+    if started:
+        screen.blit(text1, text_rect1)
+
+        text2 = font.render(os.path.basename(queue[index]), True, (255,255,255))
+        text_rect2 = text2.get_rect(center = info_rect2.center)
+        pygame.draw.rect(screen, (40,40,50), info_rect2)
+        screen.blit(text2, text_rect2)
 
     pygame.display.flip()
     clock.tick(90)
