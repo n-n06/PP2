@@ -9,3 +9,4 @@ day, month, year = tuple(map(int, input("Input a date in the DD.MM.YYYY format: 
 someday = datetime.date(year, month, day)
 diff = today - someday
 print(diff.total_seconds())
+

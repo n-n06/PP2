@@ -1,11 +1,11 @@
 '''
-1. file browsing
-2. play, stop, next, previous
-
+Music player that plays all of the 
 '''
 import os
 import pygame
 import tkinter
+import re
+
 from tkinter import filedialog
 from pygame import mixer
 from time import time
@@ -23,12 +23,8 @@ loop = True
 paused = False
 started = False
 
-#volume settings
-volume = 100
 
-
-
-
+volume = 1
 
 '''
 Image Handling
@@ -56,9 +52,19 @@ folder_rect = folder.get_rect(center = (40,40))
 '''
 File handling
 '''
-queue = [mixer.Sound("audio.mp3"), mixer.Sound("android.mp3")]
+queue = []
 index = 0
 audio_channel = mixer.Channel(1)
+
+def folder_selection():
+    root = tkinter.Tk()
+    root.withdraw()
+    selection = filedialog.askdirectory(initialdir = "C:", title = "Select a folder")
+    for dirpath, dirname, filename in os.walk(selection, "."):
+        for f in filename:
+            queue.append(os.path.join(dirpath,f))
+
+    return list(filter(re.compile(r".*\.(mp3|ogg|wav)$").match, queue))
 
 '''
 The Main Loop
@@ -83,19 +89,42 @@ while loop:
                 loop = False
             if event.key == pygame.K_ESCAPE:
                 loop = False
+            if event.key == pygame.K_UP:
+                volume += 0.05
+                if volume <= 1.0:
+                    audio_channel.set_volume(volume)
+                else:
+                    volume = audio_channel.get_volume()
+            if event.key == pygame.K_DOWN:
+                volume -= 0.05
+                if volume >= 0.0:
+                    audio_channel.set_volume(volume)
+                else:
+                    volume = audio_channel.get_volume()
+
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-            #play and pause buttons
+            #mouse position
             pos = pygame.mouse.get_pos()
+
+            #getting audio files
+            if folder_button.collidepoint(pos):
+                queue = folder_selection()
+                            
+            #play button
             if play_button.collidepoint(pos) and not started:
-                started = True
-                audio_channel.play(queue[index])
-                play = get_image("pause1.png")
-            elif play_button.collidepoint(pos) and paused:
+                print(queue)
+                try:
+                    audio_channel.play(mixer.Sound(queue[index]))
+                    started = True
+                    play = get_image("pause1.png")
+                except:
+                    print("Nothing to play yet")
+            elif play_button.collidepoint(pos) and paused and started:
                 paused = False
                 audio_channel.unpause()
                 play = get_image("pause1.png")
-            elif play_button.collidepoint(pos) and not paused:
+            elif play_button.collidepoint(pos) and not paused and started:
                 paused = True
                 audio_channel.pause()
                 play = get_image("play1.png")
@@ -106,7 +135,7 @@ while loop:
                     index -= 1
                 if started and index >= 0:
                     play = get_image("pause1.png")
-                    audio_channel.play(queue[index])
+                    audio_channel.play(mixer.Sound(queue[index]))
                 else: 
                     play = get_image("play1.png")
                     started = False
@@ -116,28 +145,18 @@ while loop:
             #forward button
             elif forward_button.collidepoint(pos):
                 index += 1
-                if started:
-                    try:
-                        play = get_image("pause1.png")
-                        audio_channel.play(queue[index])
-                    except:
-                        play = get_image("play1.png")
-                        started = False
-                        audio_channel.stop()
-                        index = 0
-            
-            elif folder_button.collidepoint(pos):
-                root = tkinter.Tk()
-                root.withdraw()
-                selection = filedialog.askdirectory(initialdir = "C:", title = "Select a folder")
-                print(os.listdir(selection))
-                
-                
-                
-                
+                if started and index < len(queue):
+                    play = get_image("pause1.png")
+                    audio_channel.play(mixer.Sound(queue[index]))
+                else:
+                    play = get_image("play1.png")
+                    started = False
+                    audio_channel.stop()
+                    index = 0
+ 
     screen.fill((50,50,60))
     #button images
-    volume = pygame.draw.rect(screen, (0,))
+
     play_button = screen.blit(play, play_rect)
     forward_button = screen.blit(forward, forward_rect)
     back_button = screen.blit(back, back_rect)
@@ -149,10 +168,3 @@ while loop:
     clock.tick(90)
 
 
-# dirname = filedialog.askdirectory()
-# print(dirname)
-'''
-1. folder browsing (tkinter, write files in a txt and read them)
-2. file representation and append system
-3. creating of playlists (maybe)
-'''

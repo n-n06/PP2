@@ -13,7 +13,8 @@ def choose_random():
     if figure == "circle":
         pygame.draw.circle(screen, (0,0,0), (100, 100), 50)
     if figure == "square":
-        pygame.draw.rect(screen, (0,0,0), pygame.Rect(100, 100, 100, 100))
+        x = 100
+        pygame.draw.rect(screen, (0,0,0), pygame.Rect(100, 100, 100, x))
     if figure == "polygon":
         pygame.draw.polygon(screen, (0,0,0), [(10,50),(10,30),(10,10),(40,30),(40,40)])
     if figure == "outline":
