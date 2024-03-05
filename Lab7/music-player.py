@@ -5,12 +5,14 @@ import os
 import pygame
 import tkinter
 import re
+import json
 
 from tkinter import filedialog
 from pygame import mixer
 from time import time
 pygame.init()
 mixer.init()
+
 
 
 '''
@@ -38,22 +40,30 @@ def get_image(path):
         image = pygame.image.load(canonicalized_path)
         _image_library[path] = image
     return image
+os.chdir("sprites")
 play = get_image("play1.png")
 forward = get_image("forward1.png")
 back = get_image("back1.png")
 folder = get_image("folder.png")
+clear = get_image("clear.png")
 
 play_rect = play.get_rect(center = (screen.get_rect().center[0], 350))
 forward_rect = forward.get_rect(center = (screen.get_rect().center[0]*3/2, 350))
 back_rect = back.get_rect(center = (screen.get_rect().center[0]/2, 350))
 folder_rect = folder.get_rect(center = (40,40))
-
+clear_rect = clear.get_rect(center = (40,100))
 
 '''
 File handling
 '''
-queue = []
 index = 0
+queue = []
+if os.access("songlist.json", os.F_OK):
+    with open("songlist.json", "r") as sl:
+        queue = json.load(sl)
+
+
+
 audio_channel = mixer.Channel(1)
 
 def folder_selection():
@@ -153,6 +163,12 @@ while loop:
                     started = False
                     audio_channel.stop()
                     index = 0
+
+            elif clear_button.collidepoint(pos):
+                if not started:
+                    queue = []
+                    if shift:
+                        os.remove("songlist.json")
  
     screen.fill((50,50,60))
     #button images
@@ -161,10 +177,12 @@ while loop:
     forward_button = screen.blit(forward, forward_rect)
     back_button = screen.blit(back, back_rect)
     folder_button = screen.blit(folder, folder_rect)
-
+    clear_button = screen.blit(clear, clear_rect)
     #
 
     pygame.display.flip()
     clock.tick(90)
 
+with open("songlist.json", "w") as sl:
+    json.dump(queue, sl)
 
