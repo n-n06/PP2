@@ -1,7 +1,6 @@
 import pygame
 import datetime
 import os
-import math
 
 pygame.init()
 loop = True
