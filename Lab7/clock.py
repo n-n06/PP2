@@ -21,14 +21,14 @@ def get_image(path):
         image = pygame.image.load(canonicalized_path)
         _image_library[path] = image
     return image
-clock_image = get_image("sprites/mickeyclock.jpg")
+clock_image = get_image("sprites/mickeyclock.png")
 clock_rect = clock_image.get_rect(center = (screen.get_rect().center))
 
-minute_image = get_image("sprites/minutes1.png")
-minute_rect = minute_image.get_rect(center = (screen.get_rect().center[0], screen.get_rect().center[1]+8))
+minute_image = get_image("sprites/rightarm.png")
+minute_rect = minute_image.get_rect(center = (screen.get_rect().center[0], screen.get_rect().center[1]))
 
-seconds_image = get_image("sprites/seconds1.png")
-seconds_rect = seconds_image.get_rect(center = (screen.get_rect().center[0], screen.get_rect().center[1]+8))
+seconds_image = get_image("sprites/leftarm.png")
+seconds_rect = seconds_image.get_rect(center = (screen.get_rect().center[0], screen.get_rect().center[1]))
 
 
 button_rect = pygame.Rect(30,20,200,50)
@@ -63,8 +63,8 @@ while loop:
     seconds = datetime.datetime.now().second
     minutes = datetime.datetime.now().minute
 
-    seconds_angle = -(seconds*6-60)
-    minutes_angle = -(minutes*6+60)+seconds_angle/60
+    seconds_angle = -(seconds*6+5)
+    minutes_angle = -(minutes*6+45)+seconds_angle/60
     
     clock.tick(144)
     

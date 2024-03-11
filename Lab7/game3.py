@@ -14,10 +14,10 @@ while loop:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             loop = False
-    if pressed[pygame.K_UP] and y > 25: y-= 10
-    if pressed[pygame.K_DOWN] and y < 375: y += 10
-    if pressed[pygame.K_LEFT] and x > 25: x -= 10
-    if pressed[pygame.K_RIGHT] and x < 675: x+= 10
+    if pressed[pygame.K_UP] and y > 30: y-= 10
+    if pressed[pygame.K_DOWN] and y < 370: y += 10
+    if pressed[pygame.K_LEFT] and x > 30: x -= 10
+    if pressed[pygame.K_RIGHT] and x < 670: x+= 10
 
     screen.fill((0,0,0))
     pygame.draw.circle(screen, (0,255,0), (x,y), 25)
