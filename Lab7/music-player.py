@@ -166,12 +166,18 @@ while loop:
                     started = False
                     audio_channel.stop()
                     index = 0
-
+            #clear button
             elif clear_button.collidepoint(pos):
-                if not started:
+                started = False
+                audio_channel.stop()
+                play = get_image("play1.png")
+                if shift:
                     queue = []
-                    if shift:
-                        os.remove("songlist.json")
+                    os.remove("songlist.json")
+                else:
+                    with open("songlist.json", "r") as sl:
+                        queue = json.load(sl)
+
  
     screen.fill((50,50,60))
     #button images
