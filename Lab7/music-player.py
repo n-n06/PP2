@@ -9,7 +9,7 @@ import json
 
 from tkinter import filedialog
 from pygame import mixer
-from time import time
+
 pygame.init()
 mixer.init()
 
@@ -122,6 +122,10 @@ while loop:
 
             #getting audio files
             if folder_button.collidepoint(pos):
+                if started:
+                    started = False
+                    play = get_image("play1.png")
+                    audio_channel.stop()
                 queue = folder_selection()
                             
             #play button
@@ -133,6 +137,7 @@ while loop:
                     play = get_image("pause1.png")
                 except:
                     print("Nothing to play yet")
+            #pause and unpause logic
             elif play_button.collidepoint(pos) and paused and started:
                 paused = False
                 audio_channel.unpause()
@@ -204,6 +209,7 @@ while loop:
     pygame.display.flip()
     clock.tick(90)
 
+#upon closing the main window, the queue is written in a json file
 with open("songlist.json", "w") as sl:
     json.dump(queue, sl)
 
