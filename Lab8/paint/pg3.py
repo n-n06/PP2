@@ -6,12 +6,13 @@ rect_select_img = pygame.image.load("rect_select.png")
 circle_select_img = pygame.image.load("circle_select.png")
 palette_select_img = pygame.image.load("palette.png")
 eraser_select_img = pygame.image.load("eraser.png")
+spectrum = pygame.image.load("color_select.jpg")
 
-rect_select_button = rect_select_img.get_rect(center = (40,40))
-circle_select_button = circle_select_img.get_rect(center = (120,40))
-palette_select_button = palette_select_img.get_rect(center = (200,40))
-eraser_select_button = eraser_select_img.get_rect(center = (280,40))
-
+rect_select_rect = rect_select_img.get_rect(center = (40,40))
+circle_select_rect = circle_select_img.get_rect(center = (120,40))
+palette_select_rect = palette_select_img.get_rect(center = (200,40))
+eraser_select_rect = eraser_select_img.get_rect(center = (280,40))
+spectrum_rect = spectrum.get_rect(center = (160,176))
 
 def main():
     pygame.init()
@@ -22,7 +23,8 @@ def main():
     x = 0
     y = 0
     points = []
-    mode = "blue"
+    mode = color = "blue"
+    
 
     while True:
 
@@ -49,11 +51,17 @@ def main():
                 elif event.key == pygame.K_b:
                     mode = "blue"
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if event.button == 1:
-                    radius = min(200, radius + 1)
-                elif event.button == 3:
-                    radius = max(1, radius - 1)
+            # if event.type == pygame.MOUSEBUTTONDOWN:
+            #     if event.button == 1:
+            #         radius = min(200, radius + 1)
+            #     elif event.button == 3:
+            #         radius = max(1, radius - 1)
+            
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouse_pos = pygame.mouse.get_pos()
+                if palette_select_button.collidepoint(mouse_pos):
+                    screen.blit(spectrum, spectrum_rect)
+                    color = color_selection(screen)
             
             if event.type == pygame.MOUSEMOTION:
                 position = event.pos
@@ -70,11 +78,11 @@ def main():
                 drawLine(screen, i, points[i], points[i + 1], radius, mode)
                 i += 1
             
-            pygame.draw.rect(screen, (112,128,144), (0,0,320,80))
-            screen.blit(rect_select_img, rect_select_button)
-            screen.blit(circle_select_img, circle_select_button)
-            screen.blit(palette_select_img, palette_select_button)
-            screen.blit(eraser_select_img, eraser_select_button)
+            # pygame.draw.rect(screen, (112,128,144), (0,0,320,80))
+            rect_select_button = screen.blit(rect_select_img, rect_select_rect)
+            circle_select_button = screen.blit(circle_select_img, circle_select_rect)
+            palette_select_button = screen.blit(palette_select_img, palette_select_rect)
+            eraser_select_button = screen.blit(eraser_select_img, eraser_select_rect)
             
             pygame.display.flip()
             clock.tick(144)
@@ -89,6 +97,8 @@ def drawLine(screen, index, start, end, width, color_mode):
         color = (c2, c1, c1)
     elif color_mode == "green":
         color = (c1, c2, c1)
+    else:
+        color = color_mode
 
     dx = start[0] - end[0]
     dy = start[1] - end[1]
@@ -101,6 +111,11 @@ def drawLine(screen, index, start, end, width, color_mode):
         x = int(aprogress * start[0] + progress * end[0])
         y = int(aprogress * start[1] + progress * end[1])
         pygame.draw.circle(screen, color, (x,y), width)
+
+def color_selection(screen):
+    if pygame.event == pygame.MOUSEBUTTONDOWN:
+        pos = pygame.mouse.get_pos()
+        return screen.get_at(pos)
 
 main()
 
