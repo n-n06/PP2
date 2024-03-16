@@ -19,5 +19,7 @@ If the current song is the last in the queue, the playback is stopped and the in
 When clicked, starts playback if it has not started yet.
 If the playback has already started, stops the playback.
 If the playback has already started and the playback us paused, the button resumes playback.
+### Up and Down Keys
+The up arrow key will increase the volume by 5% when preseed. Conversely, the down arrow key button will decrease the volume by 5%. 
 ## Additional information
 The working directory is `sprites` - the directory with all of the images and the `songlist.json` file.
