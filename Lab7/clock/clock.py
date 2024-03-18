@@ -21,19 +21,24 @@ def get_image(path):
         image = pygame.image.load(canonicalized_path)
         _image_library[path] = image
     return image
-clock_image = get_image("sprites/mickeyclock.png")
+
+
+clock_image = get_image("mickeyclock.png")
 clock_rect = clock_image.get_rect(center = (screen.get_rect().center))
 
-minute_image = get_image("sprites/rightarm.png")
+minute_image = get_image("rightarm.png")
 minute_rect = minute_image.get_rect(center = (screen.get_rect().center[0], screen.get_rect().center[1]))
 
-seconds_image = get_image("sprites/leftarm.png")
+seconds_image = get_image("leftarm.png")
 seconds_rect = seconds_image.get_rect(center = (screen.get_rect().center[0], screen.get_rect().center[1]))
 
 
 button_rect = pygame.Rect(30,20,200,50)
-not_pressed = True
 string = "View time!"
+not_pressed = True
+
+seconds_calibration = 5
+minutes_calibration = 45
 
 '''
 Rotation function
@@ -58,23 +63,26 @@ def blitRotate(surface, image, image_rect, pos, angle):
     surface.blit(rotated_image, rotated_image_rect)
 
 
+'''
+Main Loop
+'''
 
 while loop:
+    #setting the time in seconds and minutes
     seconds = datetime.datetime.now().second
     minutes = datetime.datetime.now().minute
 
-    seconds_angle = -(seconds*6+5)
-    minutes_angle = -(minutes*6+45)+seconds_angle/60
+    seconds_angle = -(seconds*6+seconds_calibration)
+    minutes_angle = -(minutes*6+minutes_calibration)+seconds_angle/60
     
-    clock.tick(144)
     
+    #checking if alt and ctrl were pressed to avoid boilerplacte code
     pressed = pygame.key.get_pressed()
-
     alt = pressed[pygame.K_LALT] or pressed[pygame.K_RALT]
     ctrl = pressed[pygame.K_LCTRL] or pressed[pygame.K_RCTRL]
 
     for event in pygame.event.get():
-        
+        #quit logic
         if event.type == pygame.QUIT:
             loop = False
         if event.type == pygame.KEYDOWN:
@@ -84,8 +92,10 @@ while loop:
                 loop = False
             if event.key == pygame.K_ESCAPE:
                 loop = False
+        #checking if the mouse was pressed
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             mouse_pos = pygame.mouse.get_pos()
+            #checking if the view time button was pressed
             if button_rect.collidepoint(mouse_pos) and not_pressed:
                 not_pressed = False
             elif button_rect.collidepoint(mouse_pos) and not not_pressed:
@@ -95,10 +105,13 @@ while loop:
 
     if not not_pressed:
         string = f"{datetime.datetime.now().minute}:{datetime.datetime.now().second}"
+
+    #placing the clock and its hands on the main surface
     screen.blit(clock_image, clock_rect)
     blitRotate(screen, seconds_image, seconds_rect, (700/2,525/2),seconds_angle)
     blitRotate(screen, minute_image, minute_rect, (700/2,525/2),minutes_angle)
-
+    
+    #the text time
     font = pygame.font.Font(None, 36)
     text = font.render(string, True, (0,20,30))
     text_rect = text.get_rect(center=button_rect.center)
@@ -106,6 +119,7 @@ while loop:
     screen.blit(text, text_rect)
 
     pygame.display.update()
+    clock.tick(60)
 
     
     

@@ -21,6 +21,15 @@ When clicked, starts playback if it has not started yet.
 If the playback has already started, stops the playback.
 If the playback has already started and the playback us paused, the button resumes playback.
 ### Up and Down Keys
-The up arrow key will increase the volume by 5% when preseed. Conversely, the down arrow key button will decrease the volume by 5%. 
+The up arrow key will increase the volume by 5% when preseed. Conversely, the down arrow key button will decrease the volume by 5%.
+## Keybinds
+- `SPACE` - play/pause
+- `CTRL-O` - folder selection
+- `LEFT` - rewind. Combined with `SHIFT` - previous song
+- `RIGHT` - next song
+- `UP` - volume up
+- `DOWN` - volume down
+- `DELETE` - clear the queue
+- `SHIFT-DELETE` - delete the entire songlist
 ## Additional information
 The working directory is `sprites` - the directory with all of the images and the `songlist.json` file.
