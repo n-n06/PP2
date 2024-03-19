@@ -79,7 +79,9 @@ class MusicPlayer():
         if os.access(path, os.F_OK):
             with open(path, "r") as sl:
                 self.queue = json.load(sl)
-
+        else:
+            with open(path, "w") as sl:
+                sl.write("[]")
     def get_songlist(self):
         li = []
         root = tkinter.Tk()
