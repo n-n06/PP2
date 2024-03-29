@@ -149,7 +149,7 @@ while loop:
 
     
 
-    pygame.display.update()
+    pygame.display.flip()
     clock.tick(60)
 
 
