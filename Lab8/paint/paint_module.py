@@ -191,7 +191,7 @@ class NRect(Figure):
         width = max(pos[0], self.start_point[0]) - x
         height = max(pos[1], self.start_point[1]) - y
 
-        self.rect = pygame.Rect(self.start_point[0], self.start_point[1], width, height)   #adjustable rect
+        self.rect = pygame.Rect(x, y, width, height)   #adjustable rect
         pygame.draw.rect(self.screen, self.color, self.rect, self.draw_size)    #when we are in the adjusting/drawing/setting size mode we draw the rect on the screen, and only when we finished doing so, we draw everything on the corresponding layer
 
     def draw_on_layer(self):
