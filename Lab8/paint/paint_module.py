@@ -67,10 +67,12 @@ class Circle(Figure):
         '''
         Changing the thickness of circle(affects only next circles). The thickness ranges from 5 to the radius of the circle
         '''
+
         if direction > 0 and self.radius > 0:
-            self.draw_size = min(self.radius, self.draw_size + 2)
+            self.draw_size = min(math.ceil(self.radius), self.draw_size + 2)
         elif direction < 0 and self.radius > 0:
             self.draw_size = max(5, self.draw_size - 2)
+
     
     def draw(self, mouse_pressed : bool):
         '''
@@ -117,13 +119,18 @@ class Palette():
     def draw_spectrum(self):
         #creating an interactive color selection button
         self.spectrum_button = self.screen.blit(self.spectrum, self.spectrum_rect)
-    def select_color(self, pressed : Tuple[bool, bool, bool], mouse_pos : Tuple[int, int]):
+    def select_color(self, pressed : Tuple[bool, bool, bool], mouse_pos : Tuple[int, int], current_color : Tuple[int,int,int]):
         #if LMB is pressed on the position of the spectrum button, we return a color value at this point
         #then we automatically swithc off the palette and color selection
         if pressed[0] and self.spectrum_button.collidepoint(mouse_pos):
             Palette.enable = False
-            return self.spectrum.get_at((mouse_pos[0], mouse_pos[1]-80))
-
+            color = self.spectrum.get_at((mouse_pos[0], mouse_pos[1]-80))
+            if color == None:
+                return current_color
+            else:
+                return color
+        else:
+            return current_color
 
 
 
@@ -154,6 +161,7 @@ class NRect(Figure):
         elif direction < 0 and self.start_point != None:
             self.draw_size = max(5, self.draw_size - 2)
 
+
     def draw(self, mouse_pressed : bool):
         '''
         Function that draws a rectangle based on the current mosue position
@@ -183,7 +191,7 @@ class NRect(Figure):
         width = max(pos[0], self.start_point[0]) - x
         height = max(pos[1], self.start_point[1]) - y
 
-        self.rect = (self.start_point[0], self.start_point[1], width, height)   #adjustable rect
+        self.rect = pygame.Rect(self.start_point[0], self.start_point[1], width, height)   #adjustable rect
         pygame.draw.rect(self.screen, self.color, self.rect, self.draw_size)    #when we are in the adjusting/drawing/setting size mode we draw the rect on the screen, and only when we finished doing so, we draw everything on the corresponding layer
 
     def draw_on_layer(self):
@@ -217,7 +225,7 @@ class Eraser(Figure):
         if direction > 0:
             self.radius = min(self.radius, self.draw_size + 2)
         elif direction < 0:
-            self.radius = max(5, self.draw_size - 2)
+            self.radius = max(15, self.draw_size - 2)
  
 
     def erase(self, mouse_pos : Tuple[int,int]):

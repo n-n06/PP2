@@ -48,7 +48,6 @@ def main():
         alt = pressed_key[pygame.K_LALT] or pressed_key[pygame.K_RALT]
         ctrl = pressed_key[pygame.K_LCTRL] or pressed_key[pygame.K_RCTRL]
 
-        
         screen.fill(bg_color) 
         canvas.draw_all()
 
@@ -79,10 +78,10 @@ def main():
             #if palette is enabled, first we draw the spectrum
             palette.draw_spectrum()
             #then select the color
-            color_mode = palette.select_color(pressed, mouse_pos)
+            color_mode = palette.select_color(pressed, mouse_pos, color_mode)
             #if color is valid, we delete its last component, which is an alpha/transparency value
             if color_mode != None:
-                color_mode = color_mode[:-1]
+                color_mode = color_mode[:3]
         else:
             #if none of the prev modes are selected, the default drawing mode from the tutorial is activated
             draw_mode = True
@@ -104,6 +103,8 @@ def main():
                     return
                 if event.key == pygame.K_ESCAPE:
                     return
+            
+
 
                 
 
