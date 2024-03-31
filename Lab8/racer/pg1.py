@@ -127,7 +127,8 @@ while loop:
     #moving the coin for every frame
     screen.blit(coin.image, coin.rect)
     coin.move(E1)
-  
+    
+    #game over screen
     if pygame.sprite.spritecollideany(P1, enemies):
         pygame.mixer.Sound("crash.wav").play()
         time.sleep(5)
@@ -148,8 +149,10 @@ while loop:
         all_sprites.add(coin)
 
     
-
-    pygame.display.flip()
+    try:
+        pygame.display.flip()
+    except:
+        print("Game OVer!")
     clock.tick(60)
 
 

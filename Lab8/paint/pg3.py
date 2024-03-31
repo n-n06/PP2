@@ -1,137 +1,19 @@
 import pygame
-import math
+from paint_module import *
 
 rect_select_img = pygame.image.load("rect_select.png")
 circle_select_img = pygame.image.load("circle_select.png")
+palette_select_img = pygame.image.load("palette.png")
 eraser_select_img = pygame.image.load("eraser.png")
-
 
 rect_select_rect = rect_select_img.get_rect(center = (40,40))
 circle_select_rect = circle_select_img.get_rect(center = (120,40))
+palette_select_rect = palette_select_img.get_rect(center = (200,40))
 eraser_select_rect = eraser_select_img.get_rect(center = (280,40))
 
 width = 640
 height = 480
 
-'''
-class Palette():
-    def __init__(self, pos, spectrum_pos):
-        self.image = pygame.image.load("palette.png")
-        self.rect = self.image.get_rect(center = pos)
-        self.spectrum_mode = False
-        self.select_mode = False
-        self.spectrum = pygame.image.load("color_select.jpg")
-        self.spectrum_rect = self.spectrum.get_rect(center=spectrum_pos)
-
-    def draw(self, screen):
-        screen.blit(self.image, self.rect)
-        if self.spectrum_mode:
-            screen.blit(self.spectrum, self.spectrum_rect)
-            self.select_mode = True
-
-    def select_spectrum(self, screen, mouse_pos):
-        if not self.spectrum_mode and self.rect.collidepoint(mouse_pos):
-            self.spectrum_mode = True
-
-    def select_color(self, screen, mouse_pos, current_color):
-        if self.spectrum_mode and self.spectrum_rect.collidepoint(mouse_pos):
-            return screen.get_at(mouse_pos)
-        else:
-            return current_color
-'''        
-
-class Circle():
-    drawn_circles = set()
-    enable = False
-
-    def __init__(self, color, screen):
-        self.color = color
-        self.surf = screen
-        self.radius = 0
-        self.center = None
-        self.drawn = False
-
-
-    
-    def draw(self, mouse_pressed):
-        if not mouse_pressed and self.center != None:
-            self.drawn = True
-            return
-        pos = pygame.mouse.get_pos()
-        if self.center == None:
-            self.center = pos
-      
-        self.radius = math.sqrt((pos[0] - self.center[0])**2 + (pos[1] - self.center[1])**2)
-        pygame.draw.circle(self.surf, self.color, self.center, self.radius)
-        self.add_circle()
-        
-
-    
-    def add_circle(self):
-        Circle.drawn_circles.add(self)
-
-
-    @classmethod
-    def draw_all(cls):
-        
-        for inst in cls.drawn_circles:
-            pygame.draw.circle(inst.surf, inst.color, inst.center, inst.radius)
-
-
-class NRect():
-    drawn_rects = set()
-    enable = False
-
-    def __init__(self, color, screen):
-        self.color = color
-        self.surf = screen
-        self.start_point = None
-        self.drawn = False
-
-    def draw(self, mouse_pressed):
-        if not mouse_pressed and self.start_point != None:
-            self.drawn = True
-            return
-
-        pos = pygame.mouse.get_pos()
-        if self.start_point == None:
-            self.start_point = pos
-
-        x = min(self.start_point[0], pos[0])
-        y = min(self.start_point[1], pos[1])
-
-        width = max(pos[0], self.start_point[0]) - x
-        height = max(pos[1], self.start_point[1]) - y
-        self.rect = (self.start_point[0], self.start_point[1], width, height)
-        pygame.draw.rect(self.surf, self.color, self.rect)
-        self.add_rect()
-
-    def add_rect(self):
-        NRect.drawn_rects.add(self)
-
-    @classmethod
-    def draw_all(cls):
-        for inst in cls.drawn_rects:
-            pygame.draw.rect(inst.surf, inst.color, inst.rect)
-
-
-class Eraser():
-    def __init__(self, bg_color, screen):
-        self.enable = False
-        self.surf = screen
-        self.layer = pygame.Surface((width, height))
-        self.color = bg_color
-        self.radius = 20
-        self.points = []
-
-    def erase(self, mouse_pos):
-        pygame.draw.circle(self.surf, self.color, mouse_pos, self.radius)
-        self.points.append(mouse_pos)
-
-    def draw_all(self):
-        self.surf.blit(self.layer, (0,0), special_flags=pygame.BLEND_RGB_ADD)
-        for x in self.points:
-            pygame.draw.circle(self.surf, self.color, x, self.radius)
 
 
 
@@ -141,46 +23,78 @@ def main():
     screen = pygame.display.set_mode((640,480))
     clock = pygame.time.Clock()
     
-    radius = 15
+    #the initial drawing parametersfrom the tutorial
+    draw_size = 5
     points = []
-    mode = "blue"
-    bg_color = (0,0,0)
+    draw_mode = True
+    
+    #color parameters - default for bg is white, for drawing - black
+    color_mode = (0,0,0)
+    bg_color = (255,255,255)
     
 
-    circle = Circle((255,255,255),screen)
-    nrect = NRect((255,255,255),screen)
-    eraser = Eraser(bg_color, screen)
-
-    #palette = Palette((200,40),(160,176))
-    
-    
+    #initializing the class instances
+    canvas = Figure(bg_color, screen, draw_size)
+    circle = Circle(color_mode, screen, draw_size)
+    nrect = NRect(color_mode, screen, draw_size)
+    palette = Palette(screen)
+    eraser = Eraser(bg_color, screen, draw_size)
+ 
+    #main loop
     while True:
 
         pressed_key = pygame.key.get_pressed()
-
+        #get bool values for frequent keys
         alt = pressed_key[pygame.K_LALT] or pressed_key[pygame.K_RALT]
         ctrl = pressed_key[pygame.K_LCTRL] or pressed_key[pygame.K_RCTRL]
 
-        screen.fill(bg_color)     
+        
+        screen.fill(bg_color) 
+        canvas.draw_all()
 
-
-
+        #mouse parametes
         pressed = pygame.mouse.get_pressed()
-        if Circle.enable:
-            circle.draw(pressed[0])
-            if circle.drawn:
-                circle = Circle((255,255,255),screen)
-        elif NRect.enable:
-            nrect.draw(pressed[0])
-            if nrect.drawn:
-                nrect = NRect((255,255,255),screen)
-        
-        
-        Circle.draw_all()
-        NRect.draw_all()                 
-        eraser.draw_all()
+        mouse_pos = pygame.mouse.get_pos()
 
+        
+        if Circle.enable:
+            #if circle mode is enabled, enter the draw function
+            circle.draw(pressed[0])
+            #if the current circle is drawn and is added to layers, create a new instance
+            if circle.drawn and circle.added_to_layers:
+                circle = Circle(color_mode, screen, draw_size)
+        elif NRect.enable:
+            #the same as for circle
+            nrect.draw(pressed[0])
+            if nrect.drawn and nrect.added_to_layers:
+                nrect = NRect(color_mode, screen, draw_size)
+        elif eraser.enable:
+            #if the LMB is pressed activate the erase function
+            if pressed[0]:
+                eraser.erase(mouse_pos)
+            #if the button is lift, all of the circles are placed on the corresponding layer
+            else:
+                eraser.draw_on_layer()
+        elif Palette.enable:
+            #if palette is enabled, first we draw the spectrum
+            palette.draw_spectrum()
+            #then select the color
+            color_mode = palette.select_color(pressed, mouse_pos)
+            #if color is valid, we delete its last component, which is an alpha/transparency value
+            if color_mode != None:
+                color_mode = color_mode[:-1]
+        else:
+            #if none of the prev modes are selected, the default drawing mode from the tutorial is activated
+            draw_mode = True
+            i = 0
+            while i < len(points) - 1:
+                drawLine(screen, i, points[i], points[i + 1], draw_size, color_mode)
+                i += 1
+           
+            
+        
         for event in pygame.event.get():
+            #quitting logic
             if event.type == pygame.QUIT:
                 return
             if event.type == pygame.KEYDOWN:
@@ -190,87 +104,55 @@ def main():
                     return
                 if event.key == pygame.K_ESCAPE:
                     return
-                
-                if event.key == pygame.K_r:
-                    mode = "red"
-                elif event.key == pygame.K_g:
-                    mode = "green"
-                elif event.key == pygame.K_b:
-                    mode = "blue"
 
+                
+
+            #checking if buttons are pressed 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if circle_select_button.collidepoint(event.pos):
+                    #switching on/off the selected mode while automatically switching off the others
                     Circle.enable = not Circle.enable
-                    NRect.enable = eraser.enable = False
+                    NRect.enable = eraser.enable = Palette.enable = draw_mode = False
+                    points = []
                 elif rect_select_button.collidepoint(event.pos):
                     NRect.enable = not NRect.enable
-                    Circle.enable = eraser.enable = False
+                    Circle.enable = eraser.enable = Palette.enable = draw_mode = False
+                    points = []
                 elif eraser_select_button.collidepoint(event.pos):
+                    eraser = Eraser(bg_color, screen, draw_size)
                     eraser.enable = not eraser.enable
-                    Circle.enable = NRect.enable = False
-                #if event.button == 1:
-                #    radius = min(200, radius + 1)
-                #elif event.button == 3:
-                #    radius = max(1, radius - 1)
-            elif event.type == pygame.MOUSEMOTION and event.buttons[0] and eraser.enable:
-                eraser.erase(event.pos)
+                    Circle.enable = NRect.enable = Palette.enable =  draw_mode = False
+                    points = []
+                elif palette_select_button.collidepoint(event.pos):
+                    Palette.enable = not Palette.enable
+                    Circle.enable = NRect.enable = eraser.enable = draw_mode =  False
+                    points = []
+              
+            #from the original tutorial
+            elif event.type == pygame.MOUSEMOTION and draw_mode:
+                # if mouse moved, add point to list
+                position = event.pos
+                points = points + [position]
+                points = points[-256:]
 
-                #palette.select_spectrum(screen, mouse_pos)
-                #mode = palette.select_color(screen, mouse_pos, mode)
-
-            #    position = event.pos
-            #    points = points + [position]
-            #    points = points[-256:]
-       
-
-
+            elif event.type == pygame.MOUSEWHEEL:
+                #changing the current draw size
+                draw_size = change_size_all(draw_size, circle, nrect, eraser, direction=event.dict["y"])
         
-            
-            #drawing
-        '''
-        i = 0
-        while i < len(points) - 1:
-            drawLine(screen, i, points[i], points[i + 1], radius, mode)
-            i += 1
-        '''
-            
+
+        #drawing the panel and select buttons that change the current drawing mode
         pygame.draw.rect(screen, (112,128,144), (0,0,320,80))
         rect_select_button = screen.blit(rect_select_img, rect_select_rect)
         circle_select_button = screen.blit(circle_select_img, circle_select_rect)
-            #palette_select_button = screen.blit(palette_select_img, palette_select_rect)
-            #palette.draw(screen)
+        palette_select_button = screen.blit(palette_select_img, palette_select_rect)
         eraser_select_button = screen.blit(eraser_select_img, eraser_select_rect)
-
-                
 
 
         pygame.display.flip()
-        clock.tick(144)
+        
+        clock.tick(60)
             
-def drawLine(screen, index, start, end, width, color_mode):
-    c1 = max(0, min(255, 2 * index - 256))
-    c2 = max(0, min(255, 2 * index))
 
-    if color_mode == "blue":
-        color = (c1, c1, c2)
-    #elif color_mode == "red":
-     #   color = (c2, c1, c1)
-    #elif color_mode == "green":
-     #   color = (c1, c2, c1)
-    else:
-        color = color_mode
-
-    dx = start[0] - end[0]
-    dy = start[1] - end[1]
-    iterations = max(abs(dx), abs(dy))
-
-    for i in range(iterations):            
-        progress = 1.0 * i /iterations
-        aprogress = 1 - progress
-
-        x = int(aprogress * start[0] + progress * end[0])
-        y = int(aprogress * start[1] + progress * end[1])
-        pygame.draw.circle(screen, color, (x,y), width)
 
 main()
 
