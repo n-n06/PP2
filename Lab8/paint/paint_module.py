@@ -9,19 +9,15 @@ class Figure():
     layers = []
     def __init__(self, color:Tuple[int,int,int], screen : pygame.surface.Surface, draw_size : int):
         '''
-        The class Figure - parent class of all of the drawable elements. Has list var layers that stores all of the object's layers to draw them in order
+        The class Figure - parent class of all of the drawable elements. Has list var layers that stores all of the object's to draw them in order
         Initialized with the following parameters (passed on by the user):
         - color - an RGB tuple
         - screen - pygame's main display Surface
         - draw_size - thickness of elements
         Automatically set parameters:
-        - layer - a transparent layer that will be blit on the main display
         - drawn - a bool parameter. whether the current object has been drawn
-        - added_to_layers - a bool parameter. whether the current object is in the Figure's class var layers
-
-        '''
+        - added_to_layers - a bool parameter. whether the current object is in the Figure's class var layers.        '''
         self.color = color
-        self.layer = pygame.Surface((width, height), pygame.SRCALPHA, 32)
         self.screen = screen
         self.drawn = False
         self.added_to_layers = False
@@ -29,19 +25,20 @@ class Figure():
 
     def add_to_layers(self):
         '''
-        Add the current instance's layer to Figure's layers list
-        layers list is then sliced to save only the last 500 layers (for the sake of optimization)
+        Add the current instance to Figure's layers list
+        layers list is then sliced to save only the last 1000 layers (for the sake of optimization)
         '''
         Figure.layers.append(self)
-        Figure.layers = Figure.layers[-500:]
+        Figure.layers = Figure.layers[-1000:]
 
     @classmethod
     def draw_all(cls):
         '''
-        Drawing each instance's layer on the main display with no coordinate offset
+        Blitting each object in the layers list
         '''
-        for inst in cls.layers:
-            inst.screen.blit(inst.layer, (0,0))
+        for o in cls.layers:
+            if o.added_to_layers:
+                o.blit()
 
 
 
@@ -57,11 +54,12 @@ class Circle(Figure):
     def __init__(self, color : Tuple[int, int, int], screen : pygame.surface.Surface, draw_size : int):
         '''
         Initializing as a child of the Figure class.
-        Setting radius to 0, and center to None as we did not draw anythin at the point of initialization
+        Setting radius to 0, and center to None as we did not draw anything at the point of initialization
         '''
         super().__init__(color, screen, draw_size)
         self.radius = 0
         self.center = None
+        self.add_to_layers()
     
     def change_size(self, direction : int):
         '''
@@ -77,17 +75,8 @@ class Circle(Figure):
     def draw(self, mouse_pressed : bool):
         '''
         Function that draws a circle based on the current mouse position
-        If the circle is drawn and is not added to the layers list of the parent class, we draw it on its layer and quit the function
-        If we have already set the circle's size and its center is not None, we mark it as a drawn circle
         '''
 
-        if self.drawn and not self.added_to_layers:
-            self.draw_on_layer()
-            self.added_to_layers = True
-            return
-        if not mouse_pressed and self.center != None:
-            self.drawn = True
-            return
         #getting the mouse position
         pos = pygame.mouse.get_pos()
         if self.center == None:
@@ -96,15 +85,17 @@ class Circle(Figure):
         
         #calculating the radius using the distance formula
         self.radius = math.sqrt((pos[0] - self.center[0])**2 + (pos[1] - self.center[1])**2)
-        #drawing the circle on the screen not on its layaer yet to avoid creating too much layers
+        #drawing the circle on the screen
         pygame.draw.circle(self.screen, self.color, self.center, self.radius, self.draw_size)
-       
+        if self.radius > 5:     #we consider a circle drawn only if it has a more or less visible radius
+            self.drawn = True
+        self.added_to_layers = True
+    
         
-    def draw_on_layer(self):
-        #drawing the current circle on its layer and adding it to the Figure class's layers list
-        pygame.draw.circle(self.layer, self.color, self.center, self.radius, self.draw_size)
-        self.add_to_layers()
 
+    #blitting the final circle on the screen. accessed in the Figure's class method draw_all()
+    def blit(self):
+        pygame.draw.circle(self.screen, self.color, self.center, self.radius, self.draw_size)
 
 class Palette():
     '''
@@ -151,6 +142,7 @@ class NRect(Figure):
         '''
         super().__init__(color, screen, draw_size)
         self.start_point = None
+        self.add_to_layers()
 
     def change_size(self, direction : int):
         '''
@@ -164,18 +156,9 @@ class NRect(Figure):
 
     def draw(self, mouse_pressed : bool):
         '''
-        Function that draws a rectangle based on the current mosue position
-        If the rectangle is drawn and is not added to the layers list of the parent class, we draw it on the layer and quit the function
-        If we have already set the rectangle's size and its position is not empty, we mark it as a drawn rectangle
+        Function that draws a rectangle based on the current mouse position
         '''
-        if self.drawn and not self.added_to_layers:
-            self.draw_on_layer()
-            self.added_to_layers = True
-            return
 
-        if not mouse_pressed and self.start_point != None:
-            self.drawn = True
-            return
         #get the mouse's position
         pos = pygame.mouse.get_pos()
 
@@ -184,28 +167,29 @@ class NRect(Figure):
             self.start_point = pos
         
         #get the difference between the starting position and the current mouse position
+        #we do this to be able to draw rects in all directions
         x = min(self.start_point[0], pos[0])
         y = min(self.start_point[1], pos[1])
-        
+    
         #setting the width and the height of the rect
         width = max(pos[0], self.start_point[0]) - x
         height = max(pos[1], self.start_point[1]) - y
 
         self.rect = pygame.Rect(x, y, width, height)   #adjustable rect
-        pygame.draw.rect(self.screen, self.color, self.rect, self.draw_size)    #when we are in the adjusting/drawing/setting size mode we draw the rect on the screen, and only when we finished doing so, we draw everything on the corresponding layer
+        pygame.draw.rect(self.screen, self.color, self.rect, self.draw_size)
+        if self.rect.width > 5 and self.rect.height > 5:
+            self.drawn = True   #we consider an object drawn only if it has a more or less defined size
+        self.added_to_layers = True
 
-    def draw_on_layer(self):
-        #drawing the current instance on its corresponding layer, and then adding it to the parent class' layers list
-        pygame.draw.rect(self.layer, self.color, self.rect, self.draw_size)
-        self.add_to_layers()
-
-
+    #blit function - draws finished rectangle
+    def blit(self):
+        pygame.draw.rect(self.screen, self.color, self.rect, self.draw_size)
 
 class Eraser(Figure):
     '''
     Eraser class - child class of Figure.
     When enalbed, draws circles of background color to eraser the objects on the canvas (if the LMB is pressed).
-    When the process of erasing is finished i.g. the LMB is not pressed anymore, the drawn circles are added to a new layer on the canvas. Thus, everything that is drawn next, will be displayed upon the erased layer.
+    When the process of erasing is finished i.g. the LMB is not pressed anymore, we create a new instance.
     Has dynamic size.
     '''
     def __init__(self, bg_color : Tuple[int,int,int], screen : pygame.surface.Surface, draw_size : int):
@@ -217,6 +201,8 @@ class Eraser(Figure):
         self.enable = False
         self.radius = draw_size
         self.points = []
+        self.add_to_layers()
+
 
     def change_size(self, direction : int):
         '''
@@ -230,17 +216,20 @@ class Eraser(Figure):
 
     def erase(self, mouse_pos : Tuple[int,int]):
         '''
-        Drawing the circles on the eraser's layer, not on the screen yet.
+        Drawing the circles on the screen.
         mouse_pos parameter is required to place the circles on the mouse's current position
         '''
-        pygame.draw.circle(self.layer, self.color, mouse_pos, self.radius)
+        
+        pygame.draw.circle(self.screen, self.color, mouse_pos, self.radius)
+        self.points.append(mouse_pos)
+        self.added_to_layers = True
+        self.drawn = True
         
 
-    def draw_on_layer(self):
-        '''
-        Adding the current layer to the parent class' layers list
-        '''
-        self.add_to_layers()
+
+    def blit(self):
+        for center in self.points:
+            pygame.draw.circle(self.screen, self.color, center, self.radius)
 
     
 def drawLine(screen, index, start, end, width, color_mode):

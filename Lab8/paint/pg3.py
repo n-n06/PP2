@@ -14,9 +14,7 @@ eraser_select_rect = eraser_select_img.get_rect(center = (280,40))
 width = 640
 height = 480
 
-
-
-
+fps = 120
 
 def main():
     pygame.init()
@@ -34,7 +32,9 @@ def main():
     
 
     #initializing the class instances
+
     canvas = Figure(bg_color, screen, draw_size)
+    
     circle = Circle(color_mode, screen, draw_size)
     nrect = NRect(color_mode, screen, draw_size)
     palette = Palette(screen)
@@ -58,22 +58,29 @@ def main():
         
         if Circle.enable:
             #if circle mode is enabled, enter the draw function
-            circle.draw(pressed[0])
-            #if the current circle is drawn and is added to layers, create a new instance
-            if circle.drawn and circle.added_to_layers:
+            if pressed[0] and not circle_select_button.collidepoint(mouse_pos):
+                circle.draw(pressed[0])
+            elif not pressed[0] and circle.drawn:
                 circle = Circle(color_mode, screen, draw_size)
+
+
+            #if the current circle is drawn and is added to layers, create a new instance
+
         elif NRect.enable:
             #the same as for circle
-            nrect.draw(pressed[0])
-            if nrect.drawn and nrect.added_to_layers:
+            if pressed[0] and not rect_select_button.collidepoint(mouse_pos):
+                nrect.draw(pressed[0])
+            elif nrect.drawn and not pressed[0]:
                 nrect = NRect(color_mode, screen, draw_size)
+            
         elif eraser.enable:
             #if the LMB is pressed activate the erase function
             if pressed[0]:
                 eraser.erase(mouse_pos)
-            #if the button is lift, all of the circles are placed on the corresponding layer
-            else:
-                eraser.draw_on_layer()
+
+            #if the button is lift, and at least something was drawn, we create a new instance of the Eraser class
+            elif not pressed[0] and not eraser.drawn:
+                eraser = Eraser(bg_color, screen, draw_size)
         elif Palette.enable:
             #if palette is enabled, first we draw the spectrum
             palette.draw_spectrum()
@@ -151,7 +158,9 @@ def main():
 
         pygame.display.flip()
         
-        clock.tick(60)
+        clock.tick(120)
+        
+
             
 
 

@@ -152,7 +152,8 @@ while loop:
     try:
         pygame.display.flip()
     except:
-        print("Game OVer!")
+        print("Game Over!")
+        loop = False
     clock.tick(60)
 
 
