@@ -119,13 +119,13 @@ def main():
         elif EqLatTriangle.enable:
             if pressed[0] and not eq_triangle_rect.collidepoint(mouse_pos):
                 eqtr.draw()
-            elif rhombus.drawn and not pressed[0]:
+            elif eqtr.drawn and not pressed[0]:
                 eqtr = EqLatTriangle(color_mode, screen, draw_size)
 
         elif RightTriangle.enable:
             if pressed[0] and not right_triangle_rect.collidepoint(mouse_pos):
                 rtr.draw()
-            elif rhombus.drawn and not pressed[0]:
+            elif rtr.drawn and not pressed[0]:
                 rtr = RightTriangle(color_mode, screen, draw_size)
 
         else:
